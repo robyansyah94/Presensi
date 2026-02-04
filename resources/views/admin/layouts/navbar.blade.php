@@ -85,7 +85,7 @@
 
                                     <div class="divide-y divide-default-100">
                                         <a href="#" class="flex px-4 py-3 hover:bg-default-100">
-                                            <div class="flex-shrink-0">
+                                            <div class="shrink-0">
                                                 <img class="rounded-lg w-11 h-11" src="{{ asset('admin/images/users/avatar-6.jpg') }}"
                                                     alt="Alex image">
                                                 <div
@@ -104,7 +104,7 @@
                                         </a>
 
                                         <a href="#" class="flex px-4 py-3 hover:bg-default-100">
-                                            <div class="flex-shrink-0">
+                                            <div class="shrink-0">
                                                 <img class="rounded-lg w-11 h-11" src="{{ asset('admin/images/users/avatar-7.jpg') }}"
                                                     alt="Sarah image">
                                                 <div
@@ -122,7 +122,7 @@
                                         </a>
 
                                         <a href="#" class="flex px-4 py-3 hover:bg-default-100">
-                                            <div class="flex-shrink-0">
+                                            <div class="shrink-0">
                                                 <img class="rounded-lg w-11 h-11" src="{{ asset('admin/images/users/avatar-8.jpg') }}"
                                                     alt="Michael image">
                                                 <div
@@ -140,7 +140,7 @@
                                         </a>
 
                                         <a href="#" class="flex px-4 py-3 hover:bg-default-100">
-                                            <div class="flex-shrink-0">
+                                            <div class="shrink-0">
                                                 <img class="rounded-lg w-11 h-11" src="{{ asset('admin/images/users/avatar-9.jpg') }}"
                                                     alt="Emma image">
                                                 <div
