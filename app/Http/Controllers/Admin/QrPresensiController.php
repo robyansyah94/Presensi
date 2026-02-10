@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Cache;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use App\Models\QrPresensi;
+use Illuminate\Support\Str;
 
 class QrPresensiController extends Controller
 {
@@ -15,10 +15,17 @@ class QrPresensiController extends Controller
 
     public function generate()
     {
-        $token = md5(now()->timestamp . rand());
+        $token = Str::random(6); // token QR dinamis
 
-        Cache::put('qr_token', $token, 10);
+        $qr = QrPresensi::create([
+            'qr_token' => $token,
+            'expired_at' => now()->addSeconds(10), // berlaku 10 detik
+            'is_active' => true
+        ]);
 
-        return QrCode::size(300)->generate($token);
+        return response()->json([
+            'qr_token' => $qr->qr_token,
+            'expired_at' => $qr->expired_at
+        ]);
     }
 }

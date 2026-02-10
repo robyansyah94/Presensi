@@ -4,88 +4,59 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use App\Models\Presensi;
 use App\Models\Karyawan;
 use App\Models\JadwalShift;
 use App\Models\QrPresensi;
-use Carbon\Carbon;
 
 class PresensiController extends Controller
 {
     public function scan(Request $request)
     {
-        $user = auth()->user();
+        $request->validate([
+            'qr_token' => 'required',
+            'user_id' => 'required'
+        ]);
 
-        // cari karyawan
-        $karyawan = Karyawan::where('users_id', $user->id)->first();
-
-        if (!$karyawan) {
-            return response()->json([
-                'message' => 'Data karyawan tidak ditemukan'
-            ], 404);
-        }
-
-        $today = Carbon::today();
-
-        // cari jadwal shift hari ini
-        $jadwal = JadwalShift::where('karyawan_id', $karyawan->id)
-            ->whereDate('tanggal', $today)
-            ->first();
-
-        if (!$jadwal) {
-            return response()->json([
-                'message' => 'Tidak ada jadwal shift hari ini'
-            ], 400);
-        }
-
-        // QR aktif
-        $qr = QrPresensi::where('is_active', true)->first();
+        // validasi QR
+        $qr = QrPresensi::where('qr_token', $request->qr_token)
+               ->where('expired_at', '>=', now())
+               ->first();
 
         if (!$qr) {
-            return response()->json([
-                'message' => 'QR tidak aktif'
-            ], 400);
+            return response()->json(['message' => 'QR tidak valid atau expired'], 400);
         }
+
+        // ambil karyawan
+        $karyawan = Karyawan::where('users_id', $request->user_id)->first();
+        if (!$karyawan) return response()->json(['message' => 'Karyawan tidak ditemukan'], 404);
+
+        // ambil jadwal shift hari ini
+        $jadwal = JadwalShift::where('karyawan_id', $karyawan->id)
+                  ->where('tanggal', now()->toDateString())
+                  ->first();
+        if (!$jadwal) return response()->json(['message' => 'Tidak ada jadwal shift hari ini'], 400);
 
         // cek presensi hari ini
         $presensi = Presensi::where('karyawan_id', $karyawan->id)
-            ->whereDate('tanggal', $today)
-            ->first();
+                    ->where('tanggal', now()->toDateString())
+                    ->first();
 
-        // ===== MASUK =====
         if (!$presensi) {
-
             Presensi::create([
                 'karyawan_id' => $karyawan->id,
                 'jadwal_shift_id' => $jadwal->id,
                 'qr_presensi_id' => $qr->id,
-                'tanggal' => $today,
-                'jam_masuk' => now(),
-                'status' => 'hadir',
-                'latitude' => $request->latitude,
-                'longitude' => $request->longitude,
-                'jarak_dari_kantor' => $request->jarak
+                'tanggal' => now()->toDateString(),
+                'jam_masuk' => now()->toTimeString(),
+                'status' => 'hadir'
             ]);
-
-            return response()->json([
-                'message' => 'Presensi masuk berhasil'
-            ]);
-        }
-
-        // ===== PULANG =====
-        if (!$presensi->jam_pulang) {
+            return response()->json(['message' => 'Absen masuk berhasil']);
+        } else {
             $presensi->update([
-                'jam_pulang' => now()
+                'jam_pulang' => now()->toTimeString()
             ]);
-
-            return response()->json([
-                'message' => 'Presensi pulang berhasil'
-            ]);
+            return response()->json(['message' => 'Absen pulang berhasil']);
         }
-
-        return response()->json([
-            'message' => 'Anda sudah presensi hari ini'
-        ], 400);
     }
 }

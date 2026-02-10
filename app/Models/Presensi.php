@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Presensi extends Model
 {
+    protected $table = 'presensi';
+
     protected $fillable = [
         'karyawan_id',
         'shift_id',
