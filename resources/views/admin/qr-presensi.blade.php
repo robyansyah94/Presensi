@@ -19,16 +19,19 @@
     </div>
 
     <script>
-        function loadQR() {
-            fetch('/admin/generate-qr')
+        function getLatestQR() {
+            fetch("{{ url('/admin/generate-qr') }}")
                 .then(res => res.text())
-                .then(data => {
-                    document.getElementById('qr-container').innerHTML = data;
-                });
+                .then(svg => {
+                    document.getElementById('qr-container').innerHTML = svg;
+                })
+                .catch(err => console.log("Error ambil QR:", err));
         }
 
-        loadQR();
-        setInterval(loadQR, 10000);
+        setInterval(getLatestQR, 10000);
+
+        // load pertama kali
+        getLatestQR();
     </script>
 
 </body>

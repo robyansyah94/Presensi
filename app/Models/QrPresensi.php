@@ -11,6 +11,6 @@ class QrPresensi extends Model
 
     protected $table = 'qr_presensi';
 
-    protected $fillable = ['qr_token', 'expired_at', 'is_active'];
+    protected $fillable = ['qr_token', 'tanggal', 'started_at', 'expired_at', 'is_active', 'shift_id'];
     public $timestamps = true;
 }
